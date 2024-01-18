@@ -297,6 +297,14 @@ template<class T> inline
     return status;
   };
 
+  // If action_server is not ready to be used, try to reconnect to it
+  if (!action_client_->action_server_is_ready()) {
+    if (!action_client_->wait_for_action_server(wait_for_server_timeout_)){
+      RCLCPP_ERROR( node_->get_logger(), "Action client/server is not connected!");
+      return NodeStatus::FAILURE;
+    }
+  }
+
   // first step to be done only at the beginning of the Action
   if (status() == BT::NodeStatus::IDLE)
   {
@@ -451,4 +459,3 @@ template<class T> inline
 
 
 }  // namespace BT
-
